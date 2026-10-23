@@ -1,0 +1,33 @@
+
+### 1. Health check
+GET http://localhost:3000/health
+
+### 2. Create a product
+POST http://localhost:3000/api/products
+Content-Type: application/json
+
+{
+  "name": "Nike Air Max 4",
+  "description": "Premium running shoes",
+  "price": 4999,
+  "stock": 10
+}
+
+### 3. Get all products
+GET http://localhost:3000/api/products
+
+
+### 4. Get one product
+GET http://localhost:3000/api/products/6adb26ba30d9a6c28f39fa7f
+
+### 5. Update the product price
+PATCH http://localhost:3000/api/products/6adb26ba30d9a6c28f39fa7f
+Content-Type: application/json
+
+{
+  "price": 3999
+}
+
+### 6. Delete the product
+DELETE http://localhost:3000/api/products/6adb26ba30d9a6c28f39fa7f
+

@@ -1,4 +1,5 @@
 import express  from "express";
+import productRoutes from "./modules/products/product.route";
 
 const app = express()
 
@@ -10,5 +11,7 @@ app.get("/health", (_req, res) => {
     message: "E-commerce API is running",
   });
 });
+
+app.use("/api/products", productRoutes);
 
 export default app;
