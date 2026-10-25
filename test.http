@@ -7,9 +7,9 @@ POST http://localhost:3000/api/products
 Content-Type: application/json
 
 {
-  "name": "Nike Air Max 12",
-  "description": "Premium running shoes",
-  "price": 4999,
+  "name": "Nike Airforce",
+  "description": "Premium Casual shoes",
+  "price": 2999,
   "stock": 10
 }
 
@@ -18,18 +18,18 @@ GET http://localhost:3000/api/products
 
 
 ### 4. Get one product
-GET http://localhost:3000/api/products/6adb26ba30d9a6c28f39fa7f
+GET http://localhost:3000/api/products/6addbbb493dd72ed021a6a30
 
 ### 5. Update the product price
-PATCH http://localhost:3000/api/products/6adb26ba30d9a6c28f39fa7f
+PATCH http://localhost:3000/api/products/6addbbb493dd72ed021a6a30
 Content-Type: application/json
 
 {
-  "price": 3999
+  "price": 9999
 }
 
 ### 6. Delete the product
-DELETE http://localhost:3000/api/products/6adb26ba30d9a6c28f39fa7f
+DELETE http://localhost:3000/api/products/6addbbb493dd72ed021a6a30
 
 
 //! Order Api test 
@@ -42,8 +42,8 @@ Content-Type: application/json
   "customerName": "Test Customer",
   "items": [
     {
-      "productId": "6adb29102387ce543a14564f",
-      "quantity": 2
+      "productId": "6addbbb493dd72ed021a6a30",
+      "quantity": 10
     }
   ]
 }
@@ -51,20 +51,15 @@ Content-Type: application/json
 ### List orders
 GET http://localhost:3000/api/orders
 
-
-
-### Get all orders
-GET http://localhost:3000/api/orders
-
 ### Get one order
-GET http://localhost:3000/api/orders/6adb291c2387ce543a145650
+GET http://localhost:3000/api/orders/6addbc2493dd72ed021a6a32
 
 ### Update order status
-PATCH http://localhost:3000/api/orders/6adb291c2387ce543a145650/status
+PATCH http://localhost:3000/api/orders/6addbc2493dd72ed021a6a32/status
 Content-Type: application/json
 
 {
-  "status": "confirmed"
+  "status": "cancelled"
 }
 
 

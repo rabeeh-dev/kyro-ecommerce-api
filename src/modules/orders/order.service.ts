@@ -1,7 +1,7 @@
-
 import mongoose from "mongoose";
 import { Order } from "./order.model.js";
-import { Product } from "../products/product.model.js";
+import { MongoProductCatalog } from "./mongo-product-catalog.js";
+const productCatalog = new MongoProductCatalog();
 
 type CreateOrderInput = {
   customerName: string;
@@ -20,23 +20,19 @@ export async function createOrder(data: CreateOrderInput) {
 
   const uniqueIds = [...new Set(productIds)];
 
-  const products = await Product.find({
-    _id: { $in: uniqueIds },
-  });
+  const products = await productCatalog.getProductsByIds(uniqueIds);
 
   if (products.length !== uniqueIds.length) {
     throw new Error("PRODUCT_NOT_FOUND");
   }
 
-  const productMap = new Map(
-    products.map((product) => [product._id.toString(), product])
-  );
+  const productMap = new Map(products.map((product) => [product.id, product]));
 
   const items = data.items.map((item) => {
     const product = productMap.get(item.productId)!;
 
     return {
-      productId: product._id,
+      productId: product.id,
       productName: product.name,
       quantity: item.quantity,
       unitPrice: product.price,
@@ -45,7 +41,7 @@ export async function createOrder(data: CreateOrderInput) {
 
   const totalAmount = items.reduce(
     (total, item) => total + item.quantity * item.unitPrice,
-    0
+    0,
   );
 
   return Order.create({
@@ -65,11 +61,11 @@ export async function getOrderById(id: string) {
 
 export async function updateOrderStatus(
   id: string,
-  status: "pending" | "confirmed" | "cancelled"
+  status: "pending" | "confirmed" | "cancelled",
 ) {
   return Order.findByIdAndUpdate(
     id,
     { status },
-    { new: true, runValidators: true }
+    { new: true, runValidators: true },
   );
 }
