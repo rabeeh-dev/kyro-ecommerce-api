@@ -7,6 +7,18 @@ services:
     environment:
       PORT: 3000
       MONGODB_URI: mongodb://mongo:27017/ecommerce
+      PRODUCT_SERVICE_URL: http://product-service:3001
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  product-service:
+    build: ./services/product-service
+    ports:
+      - "3001:3001"
+    environment:
+      PORT: 3001
+      MONGODB_URI: mongodb://mongo:27017/kyro_products
     depends_on:
       mongo:
         condition: service_healthy

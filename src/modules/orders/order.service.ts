@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { Order } from "./order.model.js";
-import { MongoProductCatalog } from "./mongo-product-catalog.js";
-const productCatalog = new MongoProductCatalog();
+import { HttpProductCatalog } from "./http-product-catalog.js";
+const productCatalog = new HttpProductCatalog();
 
 type CreateOrderInput = {
   customerName: string;
