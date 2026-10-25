@@ -7,7 +7,7 @@ POST http://localhost:3000/api/products
 Content-Type: application/json
 
 {
-  "name": "Nike Air Max 4",
+  "name": "Nike Air Max 12",
   "description": "Premium running shoes",
   "price": 4999,
   "stock": 10
@@ -30,4 +30,41 @@ Content-Type: application/json
 
 ### 6. Delete the product
 DELETE http://localhost:3000/api/products/6adb26ba30d9a6c28f39fa7f
+
+
+//! Order Api test 
+
+### Create an order
+POST http://localhost:3000/api/orders
+Content-Type: application/json
+
+{
+  "customerName": "Test Customer",
+  "items": [
+    {
+      "productId": "6adb29102387ce543a14564f",
+      "quantity": 2
+    }
+  ]
+}
+
+### List orders
+GET http://localhost:3000/api/orders
+
+
+
+### Get all orders
+GET http://localhost:3000/api/orders
+
+### Get one order
+GET http://localhost:3000/api/orders/6adb291c2387ce543a145650
+
+### Update order status
+PATCH http://localhost:3000/api/orders/6adb291c2387ce543a145650/status
+Content-Type: application/json
+
+{
+  "status": "confirmed"
+}
+
 
