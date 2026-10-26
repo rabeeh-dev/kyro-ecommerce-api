@@ -1,5 +1,4 @@
 import express  from "express";
-import productRoutes from "./modules/products/product.route";
 import orderRoutes from "./modules/orders/order.route.js";
 
 const app = express()
@@ -13,7 +12,6 @@ app.get("/health", (_req, res) => {
   });
 });
 
-app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 
 export default app;
