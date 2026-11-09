@@ -51,6 +51,10 @@ export async function create(req: Request, res: Response) {
       return res.status(404).json({ message: "One or more products not found" });
     }
 
+    if (error instanceof Error && error.message === "INSUFFICIENT_STOCK") {
+      return res.status(400).json({ message: "Insufficient inventory stock for one or more items" });
+    }
+
     console.error("Create order failed:", error);
 
     return res.status(500).json({

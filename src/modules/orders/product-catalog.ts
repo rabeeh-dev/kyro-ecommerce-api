@@ -8,4 +8,3 @@ export type ProductDetails = {
 export interface ProductCatalog {
   getProductsByIds(ids: string[]): Promise<ProductDetails[]>;
 }
-

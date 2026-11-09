@@ -1,11 +1,14 @@
-
-### 1. Health check
+### 1. Health checks
 GET http://localhost:3000/health
 
-GET http://localhost:3001/api/products
+GET http://localhost:3001/health
 
-### 2. Create a product
-POST http://localhost:3000/api/products
+GET http://localhost:3002/health
+
+### 2. Product Service (Port 3001)
+
+### Create a product
+POST http://localhost:3001/api/products
 Content-Type: application/json
 
 {
@@ -15,26 +18,58 @@ Content-Type: application/json
   "stock": 10
 }
 
-### 3. Get all products
-GET http://localhost:3000/api/products
+### Get all products
+GET http://localhost:3001/api/products
 
+### Get one product
+GET http://localhost:3001/api/products/6addbbb493dd72ed021a6a30
 
-### 4. Get one product
-GET http://localhost:3000/api/products/6addbbb493dd72ed021a6a30
-
-### 5. Update the product price
-PATCH http://localhost:3000/api/products/6addbbb493dd72ed021a6a30
+### Update product
+PATCH http://localhost:3001/api/products/6addbbb493dd72ed021a6a30
 Content-Type: application/json
 
 {
   "price": 9999
 }
 
-### 6. Delete the product
-DELETE http://localhost:3000/api/products/6addbbb493dd72ed021a6a30
+### Delete product
+DELETE http://localhost:3001/api/products/6addbbb493dd72ed021a6a30
 
 
-//! Order Api test 
+### 3. Inventory Service (Port 3002)
+
+### Initialize inventory for a product
+POST http://localhost:3002/api/inventory
+Content-Type: application/json
+
+{
+  "productId": "6addbbb493dd72ed021a6a30",
+  "sku": "NIKE-AIR-001",
+  "stock": 50,
+  "reserved": 0,
+  "location": "Warehouse-North"
+}
+
+### List all inventory
+GET http://localhost:3002/api/inventory
+
+### Get inventory by inventory ID or Product ID
+GET http://localhost:3002/api/inventory/6addbbb493dd72ed021a6a30
+
+### Update inventory stock
+PATCH http://localhost:3002/api/inventory/6addbbb493dd72ed021a6a30
+Content-Type: application/json
+
+{
+  "stock": 100,
+  "reserved": 5
+}
+
+### Delete inventory
+DELETE http://localhost:3002/api/inventory/6addbbb493dd72ed021a6a30
+
+
+### 4. Order Service (Port 3000)
 
 ### Create an order
 POST http://localhost:3000/api/orders
@@ -45,7 +80,7 @@ Content-Type: application/json
   "items": [
     {
       "productId": "6addbbb493dd72ed021a6a30",
-      "quantity": 10
+      "quantity": 2
     }
   ]
 }
@@ -63,5 +98,3 @@ Content-Type: application/json
 {
   "status": "cancelled"
 }
-
-
