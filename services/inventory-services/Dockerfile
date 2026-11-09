@@ -6,10 +6,12 @@ COPY package*.json ./
 RUN npm ci
 
 COPY tsconfig.json ./
+COPY protos ./protos
 COPY src ./src
 
 RUN npm run build
 
 EXPOSE 3002
+EXPOSE 50051
 
 CMD ["npm", "start"]

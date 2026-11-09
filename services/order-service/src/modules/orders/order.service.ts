@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
 import { Order } from "./order.model.js";
 import { HttpProductCatalog } from "./adapters/http-product-catalog.js";
-import { HttpInventoryCatalog } from "./adapters/http-inventory-catalog.js";
+import { GrpcInventoryCatalog } from "./adapters/grpc-inventory-catalog.js";
 
 const productCatalog = new HttpProductCatalog();
-const inventoryCatalog = new HttpInventoryCatalog();
+const inventoryCatalog = new GrpcInventoryCatalog();
 
 type CreateOrderInput = {
   customerName: string;
@@ -29,8 +29,8 @@ export async function createOrder(data: CreateOrderInput) {
     throw new Error("PRODUCT_NOT_FOUND");
   }
 
-  // Check inventory stock via REST API adapter if service is enabled
-  if (process.env.INVENTORY_SERVICE_URL) {
+  // Check inventory stock via gRPC adapter if service is enabled
+  if (process.env.INVENTORY_GRPC_URL || process.env.INVENTORY_SERVICE_URL) {
     for (const item of data.items) {
       const hasStock = await inventoryCatalog.checkStock(
         item.productId,

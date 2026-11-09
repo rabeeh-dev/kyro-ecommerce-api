@@ -7,7 +7,7 @@ services:
       PORT: 3000
       MONGODB_URI: mongodb://mongo:27017/ecommerce
       PRODUCT_SERVICE_URL: http://product-service:3001
-      INVENTORY_SERVICE_URL: http://inventory-service:3002
+      INVENTORY_GRPC_URL: inventory-service:50051
     depends_on:
       mongo:
         condition: service_healthy
@@ -27,8 +27,10 @@ services:
     build: ./services/inventory-services
     ports:
       - "3002:3002"
+      - "50051:50051"
     environment:
       PORT: 3002
+      GRPC_PORT: 50051
       MONGODB_URI: mongodb://mongo:27017/kyro_inventory
     depends_on:
       mongo:
