@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { Order } from "./order.model.js";
-import { HttpProductCatalog } from "./http-product-catalog.js";
-import { HttpInventoryCatalog } from "./http-inventory-catalog.js";
+import { HttpProductCatalog } from "./adapters/http-product-catalog.js";
+import { HttpInventoryCatalog } from "./adapters/http-inventory-catalog.js";
 
 const productCatalog = new HttpProductCatalog();
 const inventoryCatalog = new HttpInventoryCatalog();
@@ -72,6 +72,9 @@ export async function getOrders() {
 }
 
 export async function getOrderById(id: string) {
+  if (!mongoose.isValidObjectId(id)) {
+    return null;
+  }
   return Order.findById(id);
 }
 
@@ -79,9 +82,19 @@ export async function updateOrderStatus(
   id: string,
   status: "pending" | "confirmed" | "cancelled",
 ) {
+  if (!mongoose.isValidObjectId(id)) {
+    return null;
+  }
   return Order.findByIdAndUpdate(
     id,
     { status },
     { new: true, runValidators: true },
   );
+}
+
+export async function deleteOrder(id: string) {
+  if (!mongoose.isValidObjectId(id)) {
+    return null;
+  }
+  return Order.findByIdAndDelete(id);
 }

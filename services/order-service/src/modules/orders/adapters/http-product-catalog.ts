@@ -1,4 +1,3 @@
-
 import type {
   ProductCatalog,
   ProductDetails,
@@ -11,12 +10,22 @@ type ProductApiResponse = {
 };
 
 export class HttpProductCatalog implements ProductCatalog {
-  async getProductsByIds(ids: string[]): Promise<ProductDetails[]> {
-    const baseUrl = process.env.PRODUCT_SERVICE_URL;
+  private baseUrl?: string;
 
-    if (!baseUrl) {
+  constructor(baseUrl?: string) {
+    this.baseUrl = baseUrl;
+  }
+
+  private getBaseUrl(): string {
+    const url = this.baseUrl || process.env.PRODUCT_SERVICE_URL;
+    if (!url) {
       throw new Error("PRODUCT_SERVICE_URL is not configured");
     }
+    return url;
+  }
+
+  async getProductsByIds(ids: string[]): Promise<ProductDetails[]> {
+    const baseUrl = this.getBaseUrl();
 
     const results = await Promise.all(
       ids.map(async (id) => {

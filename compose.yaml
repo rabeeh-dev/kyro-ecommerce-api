@@ -1,6 +1,6 @@
 services:
-  api:
-    build: .
+  order-service:
+    build: ./services/order-service
     ports:
       - "3000:3000"
     environment:

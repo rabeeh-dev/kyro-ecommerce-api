@@ -1,4 +1,3 @@
-
 export type ProductDetails = {
   id: string;
   name: string;
