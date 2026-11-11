@@ -48,6 +48,16 @@ services:
       rabbitmq:
         condition: service_healthy
 
+  analytics-service:
+    build: 
+      context: ./services/analytics-service
+    container_name: analytics-service
+    environment:
+      KAFKA_BROKERS: kafka:9092
+    depends_on:
+      kafka:
+        condition: service_healthy
+
   
   rabbitmq:
     image: rabbitmq:3-management
