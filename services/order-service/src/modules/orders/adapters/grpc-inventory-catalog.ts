@@ -11,8 +11,8 @@ import type {
 function getProtoPath(): string {
   const possiblePaths = [
     path.resolve(process.cwd(), "protos/inventory.proto"),
+    path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../../protos/inventory.proto"),
     path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../protos/inventory.proto"),
-    path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../protos/inventory.proto"),
   ];
 
   for (const p of possiblePaths) {
