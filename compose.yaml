@@ -8,8 +8,11 @@ services:
       MONGODB_URI: mongodb://mongo:27017/ecommerce
       PRODUCT_SERVICE_URL: http://product-service:3001
       INVENTORY_GRPC_URL: inventory-service:50051
+      RABBITMQ_URL: amqp://admin:admin@rabbitmq:5672
     depends_on:
       mongo:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
 
   product-service:
@@ -34,6 +37,29 @@ services:
       MONGODB_URI: mongodb://mongo:27017/kyro_inventory
     depends_on:
       mongo:
+        condition: service_healthy
+  
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  notification-service:
+    build: ./services/notification-service
+    environment:
+      RABBITMQ_URL: amqp://admin:admin@rabbitmq:5672
+    depends_on:
+      rabbitmq:
         condition: service_healthy
 
   mongo:

@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { Order } from "./order.model.js";
 import { HttpProductCatalog } from "./adapters/http-product-catalog.js";
 import { GrpcInventoryCatalog } from "./adapters/grpc-inventory-catalog.js";
+import { RabbitMQPublisher } from "./adapters/rabbitmq-client.js";
 
 const productCatalog = new HttpProductCatalog();
 const inventoryCatalog = new GrpcInventoryCatalog();
@@ -13,6 +14,8 @@ type CreateOrderInput = {
     quantity: number;
   }[];
 };
+
+const rabbitPublisher = new RabbitMQPublisher();
 
 export async function createOrder(data: CreateOrderInput) {
   const productIds = data.items.map((item) => item.productId);
@@ -60,11 +63,15 @@ export async function createOrder(data: CreateOrderInput) {
     0,
   );
 
-  return Order.create({
+  const newOrder = await Order.create({
     customerName: data.customerName,
     items,
     totalAmount,
   });
+
+  await rabbitPublisher.publishOrderCreated(newOrder);
+
+  return newOrder;
 }
 
 export async function getOrders() {
