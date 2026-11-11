@@ -1,8 +1,8 @@
 services:
   order-service:
     build: ./services/order-service
-    ports:
-      - "3000:3000"
+    # ports:
+    #   - "3000:3000"
     environment:
       PORT: 3000
       MONGODB_URI: mongodb://mongo:27017/ecommerce
@@ -18,8 +18,8 @@ services:
 
   product-service:
     build: ./services/product-service
-    ports:
-      - "3001:3001"
+    # ports:
+    #   - "3001:3001"
     environment:
       PORT: 3001
       MONGODB_URI: mongodb://mongo:27017/kyro_products
@@ -29,9 +29,9 @@ services:
 
   inventory-service:
     build: ./services/inventory-services
-    ports:
-      - "3002:3002"
-      - "50051:50051"
+    # ports:
+    #   - "3002:3002"
+    #   - "50051:50051"
     environment:
       PORT: 3002
       GRPC_PORT: 50051
@@ -57,6 +57,21 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
+
+  api-gateway:
+    build:
+      context: ./services/api-gateway
+    container_name: api-gateway
+    ports:
+      - "4000:4000" # ONLY the Gateway is exposed to your laptop/frontend
+    depends_on:
+      - order-service
+      - product-service
+      - inventory-service
+
+  # IMPORTANT SECURITY UPDATE:
+  # Go to your 'api', 'product-service', and 'inventory-service' blocks 
+  # and DELETE their "ports:" definitions! They should only talk internally.
 
   
   rabbitmq:
