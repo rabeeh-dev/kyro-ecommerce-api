@@ -3,6 +3,7 @@ import { Order } from "./order.model.js";
 import { HttpProductCatalog } from "./adapters/http-product-catalog.js";
 import { GrpcInventoryCatalog } from "./adapters/grpc-inventory-catalog.js";
 import { RabbitMQPublisher } from "./adapters/rabbitmq-client.js";
+import { KafkaPublisher } from "./adapters/kafka-client.js"
 
 const productCatalog = new HttpProductCatalog();
 const inventoryCatalog = new GrpcInventoryCatalog();
@@ -16,6 +17,7 @@ type CreateOrderInput = {
 };
 
 const rabbitPublisher = new RabbitMQPublisher();
+const kafkaPublisher = new KafkaPublisher();
 
 export async function createOrder(data: CreateOrderInput) {
   const productIds = data.items.map((item) => item.productId);
@@ -70,6 +72,7 @@ export async function createOrder(data: CreateOrderInput) {
   });
 
   await rabbitPublisher.publishOrderCreated(newOrder);
+  await kafkaPublisher.streamOrderEvent(newOrder);
 
   return newOrder;
 }
