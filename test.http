@@ -1,4 +1,18 @@
-### 1. Health checks
+@baseUrl = http://localhost:4000
+
+### 0. API Gateway (Port 4000 - Public Entrypoint)
+GET {{baseUrl}}/health
+
+### Gateway: List Products
+GET {{baseUrl}}/api/products
+
+### Gateway: List Inventory
+GET {{baseUrl}}/api/inventory
+
+### Gateway: List Orders
+GET {{baseUrl}}/api/orders
+
+### 1. Health checks (Direct Container / Local Dev)
 GET http://localhost:3000/health
 
 GET http://localhost:3001/health

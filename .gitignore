@@ -1,22 +1,65 @@
+# ==========================================
 # Dependencies
+# ==========================================
 node_modules/
+.pnp
+.pnp.js
 
-# Build and test output
+# ==========================================
+# Build & Test Output
+# ==========================================
 dist/
+build/
 coverage/
 *.tsbuildinfo
+.eslintcache
 
-# Local environment files
+# ==========================================
+# Local Environment & Secrets
+# ==========================================
 .env
 .env.*
+.env.local
 !.env.example
 
-# Logs
+# REST Client local variables & secrets
+.rest-client/
+*.env.json
+http-client.env.json
+
+# ==========================================
+# Docker & Local Overrides
+# ==========================================
+docker-compose.override.yml
+compose.override.yaml
+
+# ==========================================
+# Logs & Diagnostic Dumps
+# ==========================================
 *.log
 npm-debug.log*
 yarn-debug.log*
+yarn-error.log*
 pnpm-debug.log*
+lerna-debug.log*
 
-# Operating system files
+# ==========================================
+# IDE & Editor Configurations
+# ==========================================
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+*.sublime-project
+*.sublime-workspace
+
+# ==========================================
+# Operating System Artifacts
+# ==========================================
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
