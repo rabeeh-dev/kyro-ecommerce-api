@@ -1,5 +1,5 @@
 import amqp from "amqplib";
-import { Order } from "./order.model.js";
+import { Order } from "../modules/orders/order.model.js";
 
 type InventoryEventData = {
   orderId: string;

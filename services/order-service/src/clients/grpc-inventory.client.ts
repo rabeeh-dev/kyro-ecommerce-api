@@ -3,16 +3,28 @@ import { fileURLToPath } from "node:url";
 import fs from "node:fs";
 import * as grpc from "@grpc/grpc-js";
 import * as protoLoader from "@grpc/proto-loader";
-import type {
-  InventoryCatalog,
-  InventoryDetails,
-} from "./inventory-catalog.js";
+
+export interface InventoryDetails {
+  id: string;
+  productId: string;
+  sku: string;
+  stock: number;
+  reserved: number;
+  availableStock: number;
+  location: string;
+}
+
+export interface InventoryCatalog {
+  getInventory(productIdOrId: string): Promise<InventoryDetails | null>;
+  checkStock(productId: string, quantity: number): Promise<boolean>;
+}
 
 function getProtoPath(): string {
   const possiblePaths = [
     path.resolve(process.cwd(), "protos/inventory.proto"),
-    path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../../protos/inventory.proto"),
+    path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../protos/inventory.proto"),
     path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../protos/inventory.proto"),
+    path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../../protos/inventory.proto"),
   ];
 
   for (const p of possiblePaths) {

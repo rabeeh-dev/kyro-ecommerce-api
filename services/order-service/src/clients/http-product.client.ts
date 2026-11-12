@@ -1,7 +1,12 @@
-import type {
-  ProductCatalog,
-  ProductDetails,
-} from "./product-catalog.js";
+export interface ProductDetails {
+  id: string;
+  name: string;
+  price: number;
+}
+
+export interface ProductCatalog {
+  getProductsByIds(ids: string[]): Promise<ProductDetails[]>;
+}
 
 type ProductApiResponse = {
   _id: string;

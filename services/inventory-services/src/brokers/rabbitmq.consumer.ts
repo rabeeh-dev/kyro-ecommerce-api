@@ -1,6 +1,6 @@
 import amqp from "amqplib";
 import { Inventory } from "../modules/inventory/inventory.model.js";
-import { rabbitPublisher } from "./rabbitmq-publisher.js";
+import { rabbitPublisher } from "./rabbitmq.publisher.js";
 
 type OrderItem = {
   productId: string;

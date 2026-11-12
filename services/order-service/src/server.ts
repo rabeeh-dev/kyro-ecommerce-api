@@ -1,7 +1,7 @@
 import "dotenv/config";
 import app from "./app.js";
 import { connectDatabase } from "./config/db.js";
-import { startOrderSagaConsumer } from "./modules/orders/saga-consumer.js";
+import { startOrderSagaConsumer } from "./brokers/saga.consumer.js";
 
 const PORT = Number(process.env.PORT) || 3000;
 

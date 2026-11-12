@@ -4,4 +4,4 @@ COPY package*.json ./
 RUN npm install
 COPY . .
 EXPOSE 4000
-CMD ["npx", "tsx", "server.ts"]
+CMD ["npx", "tsx", "src/server.ts"]

@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 import { Order } from "./order.model.js";
-import { HttpProductCatalog } from "./adapters/http-product-catalog.js";
-import { RabbitMQPublisher } from "./adapters/rabbitmq-client.js";
-import { KafkaPublisher } from "./adapters/kafka-client.js";
+import { HttpProductCatalog } from "../../clients/http-product.client.js";
+import { RabbitMQPublisher } from "../../brokers/rabbitmq.client.js";
+import { KafkaPublisher } from "../../brokers/kafka.client.js";
 
 const productCatalog = new HttpProductCatalog();
 const rabbitPublisher = new RabbitMQPublisher();
