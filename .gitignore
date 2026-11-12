@@ -26,6 +26,8 @@ coverage/
 .rest-client/
 *.env.json
 http-client.env.json
+*.http
+*.rest
 
 # ==========================================
 # Docker & Local Overrides
