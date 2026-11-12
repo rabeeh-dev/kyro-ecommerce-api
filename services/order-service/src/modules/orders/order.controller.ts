@@ -42,25 +42,23 @@ export async function create(req: Request, res: Response) {
 
     return res.status(201).json(order);
   } catch (error) {
-    if (error instanceof Error && error.message === "INVALID_PRODUCT_ID") {
-      return res.status(400).json({ message: "Invalid product ID" });
-    }
-
-    if (error instanceof Error && error.message === "PRODUCT_NOT_FOUND") {
-      return res.status(404).json({ message: "One or more products not found" });
-    }
-
+    // In services/order-service/src/modules/orders/order.controller.ts catch block:
     if (error instanceof Error && error.message === "INSUFFICIENT_STOCK") {
       return res.status(400).json({
         message: "Insufficient inventory stock for one or more items",
       });
     }
 
-    console.error("Create order failed:", error);
-    return res.status(500).json({
-      message: "Failed to create order",
-    });
-  }
+    if (
+      error instanceof Error &&
+      (error.message === "INVENTORY_SERVICE_UNAVAILABLE" ||
+        error.message === "PRODUCT_SERVICE_UNAVAILABLE")
+    ) {
+      return res.status(503).json({
+        message: "A dependent service is temporarily unavailable. Please try again later.",
+      });
+    }
+}
 }
 
 export async function list(_req: Request, res: Response) {
@@ -140,3 +138,4 @@ export async function remove(req: Request, res: Response) {
     return res.status(500).json({ message: "Failed to delete order" });
   }
 }
+

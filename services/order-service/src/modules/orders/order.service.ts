@@ -1,12 +1,14 @@
+// services/order-service/src/modules/orders/order.service.ts
 import mongoose from "mongoose";
 import { Order } from "./order.model.js";
 import { HttpProductCatalog } from "./adapters/http-product-catalog.js";
-import { GrpcInventoryCatalog } from "./adapters/grpc-inventory-catalog.js";
 import { RabbitMQPublisher } from "./adapters/rabbitmq-client.js";
-import { KafkaPublisher } from "./adapters/kafka-client.js"
+import { KafkaPublisher } from "./adapters/kafka-client.js";
+import { checkInventoryStock } from "./adapters/inventory-client.js";
 
 const productCatalog = new HttpProductCatalog();
-const inventoryCatalog = new GrpcInventoryCatalog();
+const rabbitPublisher = new RabbitMQPublisher();
+const kafkaPublisher = new KafkaPublisher();
 
 type CreateOrderInput = {
   customerName: string;
@@ -16,9 +18,6 @@ type CreateOrderInput = {
   }[];
 };
 
-const rabbitPublisher = new RabbitMQPublisher();
-const kafkaPublisher = new KafkaPublisher();
-
 export async function createOrder(data: CreateOrderInput) {
   const productIds = data.items.map((item) => item.productId);
 
@@ -27,31 +26,35 @@ export async function createOrder(data: CreateOrderInput) {
   }
 
   const uniqueIds = [...new Set(productIds)];
-
   const products = await productCatalog.getProductsByIds(uniqueIds);
 
   if (products.length !== uniqueIds.length) {
     throw new Error("PRODUCT_NOT_FOUND");
   }
 
-  // Check inventory stock via gRPC adapter if service is enabled
+  // Aggregate quantities by product to avoid over-ordering across split lines
   if (process.env.INVENTORY_GRPC_URL || process.env.INVENTORY_SERVICE_URL) {
+    const quantitiesByProduct = new Map<string, number>();
     for (const item of data.items) {
-      const hasStock = await inventoryCatalog.checkStock(
-        item.productId,
-        item.quantity,
-      );
-      if (!hasStock) {
-        throw new Error("INSUFFICIENT_STOCK");
-      }
+      const current = quantitiesByProduct.get(item.productId) || 0;
+      quantitiesByProduct.set(item.productId, current + item.quantity);
     }
+
+    // Check all products concurrently through the circuit breaker
+    await Promise.all(
+      Array.from(quantitiesByProduct.entries()).map(async ([productId, totalQty]) => {
+        const hasStock = await checkInventoryStock(productId, totalQty);
+        if (!hasStock) {
+          throw new Error("INSUFFICIENT_STOCK");
+        }
+      })
+    );
   }
 
   const productMap = new Map(products.map((product) => [product.id, product]));
 
   const items = data.items.map((item) => {
     const product = productMap.get(item.productId)!;
-
     return {
       productId: product.id,
       productName: product.name,
