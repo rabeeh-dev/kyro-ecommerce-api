@@ -1,22 +1,8 @@
-
 import "dotenv/config";
-import express from "express";
+import { app } from "./app.js";
 import { connectDatabase } from "./config/db.js";
-import productRoutes from "./modules/products/product.route.js";
 
-const app = express();
 const PORT = Number(process.env.PORT) || 3001;
-
-app.use(express.json());
-
-app.get("/health", (_req, res) => {
-  res.status(200).json({
-    service: "product-service",
-    status: "healthy",
-  });
-});
-
-app.use("/api/products", productRoutes);
 
 async function startServer() {
   try {
