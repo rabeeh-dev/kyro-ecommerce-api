@@ -48,8 +48,12 @@ const orderSchema = new Schema(
     },
     status: {
       type: String,
-      enum: ["pending", "confirmed", "cancelled"],
+      enum: ["pending", "confirmed", "cancelled", "PENDING", "CONFIRMED", "CANCELLED"],
       default: "pending",
+    },
+    cancelReason: {
+      type: String,
+      trim: true,
     },
   },
   { timestamps: true }

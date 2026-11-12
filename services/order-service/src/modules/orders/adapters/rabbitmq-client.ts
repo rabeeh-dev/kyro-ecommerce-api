@@ -37,6 +37,17 @@ export class RabbitMQPublisher {
     return this.channel;
   }
 
+  async publish(exchange: string, routingKey: string, message: unknown) {
+    try {
+      const channel = await this.getChannel();
+      await channel.assertExchange(exchange, "topic", { durable: true });
+      channel.publish(exchange, routingKey, Buffer.from(JSON.stringify(message)));
+      console.log(`🚀 [EVENT PUBLISHED] Event sent to exchange '${exchange}' with routing key '${routingKey}'`);
+    } catch (error) {
+      console.error(`Failed to publish to exchange ${exchange}:`, error);
+    }
+  }
+
   async publishOrderCreated(orderData: unknown) {
     try {
       const channel = await this.getChannel();

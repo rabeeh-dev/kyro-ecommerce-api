@@ -42,7 +42,14 @@ export async function create(req: Request, res: Response) {
 
     return res.status(201).json(order);
   } catch (error) {
-    // In services/order-service/src/modules/orders/order.controller.ts catch block:
+    if (error instanceof Error && error.message === "INVALID_PRODUCT_ID") {
+      return res.status(400).json({ message: "Invalid product ID" });
+    }
+
+    if (error instanceof Error && error.message === "PRODUCT_NOT_FOUND") {
+      return res.status(404).json({ message: "One or more products not found" });
+    }
+
     if (error instanceof Error && error.message === "INSUFFICIENT_STOCK") {
       return res.status(400).json({
         message: "Insufficient inventory stock for one or more items",
@@ -58,7 +65,12 @@ export async function create(req: Request, res: Response) {
         message: "A dependent service is temporarily unavailable. Please try again later.",
       });
     }
-}
+
+    console.error("Create order failed:", error);
+    return res.status(500).json({
+      message: "Failed to create order",
+    });
+  }
 }
 
 export async function list(_req: Request, res: Response) {

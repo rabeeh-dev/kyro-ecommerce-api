@@ -4,6 +4,7 @@ import cors from "cors";
 import { connectDatabase } from "./config/db.js";
 import inventoryRoutes from "./modules/inventory/inventory.route.js";
 import { startGrpcServer } from "./grpc/grpc.server.js";
+import { startInventoryConsumer } from "./rabbitmq/rabbitmq-consumer.js";
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3002;
@@ -28,6 +29,9 @@ async function startServer() {
 
     // Start gRPC server
     await startGrpcServer(GRPC_PORT);
+
+    // Start RabbitMQ Saga Consumer
+    await startInventoryConsumer();
 
     // Start HTTP server
     app.listen(PORT, "0.0.0.0", () => {

@@ -1,10 +1,8 @@
-// services/order-service/src/modules/orders/order.service.ts
 import mongoose from "mongoose";
 import { Order } from "./order.model.js";
 import { HttpProductCatalog } from "./adapters/http-product-catalog.js";
 import { RabbitMQPublisher } from "./adapters/rabbitmq-client.js";
 import { KafkaPublisher } from "./adapters/kafka-client.js";
-import { checkInventoryStock } from "./adapters/inventory-client.js";
 
 const productCatalog = new HttpProductCatalog();
 const rabbitPublisher = new RabbitMQPublisher();
@@ -32,25 +30,6 @@ export async function createOrder(data: CreateOrderInput) {
     throw new Error("PRODUCT_NOT_FOUND");
   }
 
-  // Aggregate quantities by product to avoid over-ordering across split lines
-  if (process.env.INVENTORY_GRPC_URL || process.env.INVENTORY_SERVICE_URL) {
-    const quantitiesByProduct = new Map<string, number>();
-    for (const item of data.items) {
-      const current = quantitiesByProduct.get(item.productId) || 0;
-      quantitiesByProduct.set(item.productId, current + item.quantity);
-    }
-
-    // Check all products concurrently through the circuit breaker
-    await Promise.all(
-      Array.from(quantitiesByProduct.entries()).map(async ([productId, totalQty]) => {
-        const hasStock = await checkInventoryStock(productId, totalQty);
-        if (!hasStock) {
-          throw new Error("INSUFFICIENT_STOCK");
-        }
-      })
-    );
-  }
-
   const productMap = new Map(products.map((product) => [product.id, product]));
 
   const items = data.items.map((item) => {
@@ -72,9 +51,13 @@ export async function createOrder(data: CreateOrderInput) {
     customerName: data.customerName,
     items,
     totalAmount,
+    status: "PENDING",
   });
 
-  await rabbitPublisher.publishOrderCreated(newOrder);
+  // Emit the event to RabbitMQ. The Order Service's job is now DONE.
+  await rabbitPublisher.publish("saga-exchange", "order.created", newOrder);
+
+  // We also send it to Kafka for the Analytics dashboard
   await kafkaPublisher.streamOrderEvent(newOrder);
 
   return newOrder;
@@ -93,7 +76,7 @@ export async function getOrderById(id: string) {
 
 export async function updateOrderStatus(
   id: string,
-  status: "pending" | "confirmed" | "cancelled",
+  status: "pending" | "confirmed" | "cancelled" | "PENDING" | "CONFIRMED" | "CANCELLED",
 ) {
   if (!mongoose.isValidObjectId(id)) {
     return null;
