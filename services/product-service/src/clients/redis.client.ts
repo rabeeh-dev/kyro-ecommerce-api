@@ -1,41 +1,13 @@
-export interface CacheClient {
-  get(key: string): Promise<string | null>;
-  set(key: string, value: string, ttlSeconds?: number): Promise<void>;
-  del(key: string): Promise<void>;
-}
+import { createClient } from 'redis';
 
-/**
- * Redis Client Preparation Wrapper
- * Ready for connection when ioredis / redis is introduced into Docker infrastructure.
- */
-export class RedisClient implements CacheClient {
-  private inMemoryCache: Map<string, { value: string; expiresAt?: number }> = new Map();
-  private isConnected: boolean = false;
+// Initialize the client using the Docker environment variable
+export const redisClient = createClient({
+  url: process.env.REDIS_URL || 'redis://localhost:6379'
+});
 
-  constructor() {
-    const redisHost = process.env.REDIS_HOST || "localhost";
-    const redisPort = process.env.REDIS_PORT || "6379";
-    console.log(`🔌 [REDIS PREP] Redis client initialized (target: ${redisHost}:${redisPort})`);
-  }
+redisClient.on('error', (err: Error) => console.error('❌ Redis Client Error:', err));
+redisClient.on('connect', () => console.log('✅ Connected to Redis Cache'));
 
-  async get(key: string): Promise<string | null> {
-    const cached = this.inMemoryCache.get(key);
-    if (!cached) return null;
-    if (cached.expiresAt && Date.now() > cached.expiresAt) {
-      this.inMemoryCache.delete(key);
-      return null;
-    }
-    return cached.value;
-  }
-
-  async set(key: string, value: string, ttlSeconds?: number): Promise<void> {
-    const expiresAt = ttlSeconds ? Date.now() + ttlSeconds * 1000 : undefined;
-    this.inMemoryCache.set(key, { value, expiresAt });
-  }
-
-  async del(key: string): Promise<void> {
-    this.inMemoryCache.delete(key);
-  }
-}
-
-export const redisClient = new RedisClient();
+export const connectRedis = async () => {
+  await redisClient.connect();
+};
